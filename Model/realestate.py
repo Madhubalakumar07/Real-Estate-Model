@@ -1,6 +1,11 @@
 import pandas as pd
 import numpy as np
+import pickle
+import json
 import matplotlib.pyplot as plt
+from sklearn.model_selection import ShuffleSplit, train_test_split, GridSearchCV, cross_val_score
+from sklearn.linear_model import LinearRegression, Lasso
+from sklearn.tree import DecisionTreeRegressor
 
 # Load the dataset
 df = pd.read_csv(r"D:\Codes\Realestate model\Model\bengaluru_house_prices.csv")
@@ -98,3 +103,77 @@ plt.show()
 df = df[df['bath'] < df['bhk'] + 2]
 print(df.shape) 
 df.drop(['size', 'price_per_sqft'], axis=1, inplace=True)
+
+# One-hot encoding for location
+dummies = pd.get_dummies(df['location'])
+df = pd.concat([df, dummies.drop('other', axis=1)], axis=1)
+df.drop('location', axis=1, inplace=True)
+print(df.head())
+
+# Prepare the data for modeling
+X = df.drop('price', axis=1)
+y = df['price']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Choose the best model using GridSearchCV
+def find_best_model_using_gridsearchcv(X, y):
+    algorithms = {
+        'linear_regression': {
+            'model': LinearRegression(),
+            'parameters': {
+            }
+        },
+        'lasso': {
+            'model': Lasso(),
+            'parameters': {
+                'alpha': [1, 2],
+                'selection': ['random', 'cyclic']
+            }
+        },
+        'decision_tree': {
+            'model': DecisionTreeRegressor(),
+            'parameters': {
+                'criterion': ['squared_error', 'friedman_mse'],
+                'splitter': ['best', 'random']
+            }
+        }
+    }
+    scores = []
+    cv = ShuffleSplit(n_splits=5, test_size=0.2, random_state=42)
+    for algorithm_name, config in algorithms.items():
+        gs = GridSearchCV(config['model'], config['parameters'], cv=cv, return_train_score=False)
+        gs.fit(X, y)
+        scores.append({
+            'model': algorithm_name,
+            'best_score': gs.best_score_,
+            'best_params': gs.best_params_
+        })
+    return pd.DataFrame(scores, columns=['model', 'best_score', 'best_params'])
+best_model = find_best_model_using_gridsearchcv(X_train, y_train)
+print(best_model)
+
+# Train the best model(Linear Regression) and evaluate it
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Predict function
+def predict_price(location, sqft, bath, bhk):
+    loc_index = np.where(X.columns == location)[0][0] if location in X.columns else -1
+    x = np.zeros(len(X.columns))
+    x[0] = sqft
+    x[1] = bath
+    x[2] = bhk
+    if loc_index >= 0:
+        x[loc_index] = 1
+    return model.predict([x])[0]
+
+# Save the model and columns to a file
+with open('model.pkl', 'wb') as f:
+    pickle.dump(model, f)
+
+# Save the columns to a JSON file
+columns_data = {
+    "columns": [col.lower() for col in X.columns]
+}
+with open('columns.json', 'w') as f:
+    json.dump(columns_data, f)
