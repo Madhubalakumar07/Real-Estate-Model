@@ -14,10 +14,10 @@ def load_saved_artifacts():
     global __model
     global __location
 
-    with open("D:\Codes\Realestate model\Model\columns.json", "r") as f:
+    with open("D:\Projects\Realestate model\Model\columns.json", "r") as f:
         __data_columns = json.load(f)['columns']
         __location = __data_columns[3:]  # Assuming the first 3 columns are sqft, bath, bhk
-    with open("D:\Codes\Realestate model\Model\model.pkl", "rb") as f:
+    with open("D:\Projects\Realestate model\Model\model.pkl", "rb") as f:
         __model = pickle.load(f)
     print("Loading saved artifacts...done")
 

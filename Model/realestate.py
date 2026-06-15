@@ -8,7 +8,7 @@ from sklearn.linear_model import LinearRegression, Lasso
 from sklearn.tree import DecisionTreeRegressor
 
 # Load the dataset
-df = pd.read_csv(r"D:\Codes\Realestate model\Model\bengaluru_house_prices.csv")
+df = pd.read_csv(r"D:\Projects\Realestate model\Model\bengaluru_house_prices.csv")
 print(df.head())
 print(df.shape)
 
