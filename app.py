@@ -5,6 +5,7 @@ import util
 app = Flask(__name__)
 CORS(app)
 
+util.load_saved_artifacts()
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -29,6 +30,6 @@ def predict_price():
     return jsonify({
         'estimated_price': estimated_price
     })
+
 if __name__ == "__main__":
-    util.load_saved_artifacts()
     app.run(debug=True)
