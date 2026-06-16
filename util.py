@@ -1,23 +1,25 @@
 import json
 import pickle
 import numpy as np
+import os
 
-# Global variables to hold the model and data columns
 __location = None
 __model = None
 __data_columns = None
 
-# Function to load the saved model and data columns
+
 def load_saved_artifacts():
     print("Loading saved artifacts...start")
     global __data_columns
-    global __model
     global __location
-
-    with open("D:\Projects\Realestate model\Model\columns.json", "r") as f:
-        __data_columns = json.load(f)['columns']
-        __location = __data_columns[3:]  # Assuming the first 3 columns are sqft, bath, bhk
-    with open("D:\Projects\Realestate model\Model\model.pkl", "rb") as f:
+    global __model
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    MODEL_DIR = os.path.join(BASE_DIR, "model")
+     # If your folder is named Model, use "Model"
+    with open(os.path.join(MODEL_DIR, "columns.json"), "r") as f:
+        __data_columns = json.load(f)["columns"]
+        __location = __data_columns[3:]
+    with open(os.path.join(MODEL_DIR, "model.pkl"), "rb") as f:
         __model = pickle.load(f)
     print("Loading saved artifacts...done")
 

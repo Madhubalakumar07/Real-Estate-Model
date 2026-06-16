@@ -2,11 +2,13 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Banglore Home Price Prediction</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+    <title>Bangalore Home Price Prediction</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="script.js"></script>
-	<link rel="stylesheet" href="style.css">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </head>
 <body>
 <div class="page-shell">
